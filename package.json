@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "populate": "node scripts/populate/index.js"
+    "populate": "node scripts/populate/index.js",
+    "migrate": "prisma migrate dev --name init"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^3.5.0",

@@ -2,9 +2,14 @@
 
 import { useCart } from "@/contexts/CartContext";
 import { useCartProducts } from "@/contexts/CartProductsContext";
+import clsx from "clsx";
 import { useMemo } from "react";
 
-export function TotalCost(): JSX.Element {
+type Props = {
+  discountPercentage?: number;
+};
+
+export function TotalCost({ discountPercentage }: Props): JSX.Element {
   const { itemCounts } = useCart();
   const { products } = useCartProducts();
 
@@ -25,10 +30,27 @@ export function TotalCost(): JSX.Element {
     [itemCounts, productsMap],
   );
 
+  const discountedCost = useMemo(
+    () => (totalCost * (100 - (discountPercentage ?? 0))) / 100,
+    [discountPercentage, totalCost],
+  );
+
   return (
     <div className="flex min-h-full flex-col rounded-xl bg-orange-100 p-4 font-bold">
       <div>Valor total</div>
-      <div>
+      {discountedCost !== totalCost ? (
+        <div>
+          {new Intl.NumberFormat("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+          }).format(discountedCost)}
+        </div>
+      ) : null}
+      <div
+        className={clsx({
+          "text-sm line-through opacity-50": discountedCost !== totalCost,
+        })}
+      >
         {new Intl.NumberFormat("pt-BR", {
           style: "currency",
           currency: "BRL",

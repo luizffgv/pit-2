@@ -4,7 +4,13 @@ const prisma = new PrismaClient();
 
 await prisma.$connect();
 
+await prisma.productsOnOrders.deleteMany();
+
+await prisma.order.deleteMany();
+
 await prisma.product.deleteMany();
+
+await prisma.coupon.deleteMany();
 
 await prisma.product.createMany({
   data: [
@@ -58,6 +64,19 @@ await prisma.product.createMany({
       description:
         "Espresso com leite vaporizado, similar ao latte mas com menos espuma",
       price: 4.5,
+    },
+  ],
+});
+
+await prisma.coupon.createMany({
+  data: [
+    {
+      code: "BLACK10",
+      discountPercentage: 10,
+    },
+    {
+      code: "WELCOME15",
+      discountPercentage: 15,
     },
   ],
 });

@@ -1,16 +1,48 @@
 datasource db {
-    provider = "sqlite"
-    url      = "file:./prod.db"
+  provider = "sqlite"
+  url      = "file:./prod.db"
 }
 
 generator client {
-    provider = "prisma-client-js"
-    output   = "./prisma/prisma-client-js"
+  provider = "prisma-client-js"
+  output   = "./prisma/prisma-client-js"
+}
+
+model User {
+  id    String  @id
+  Order Order[]
+}
+
+model Order {
+  id               Int                @id @default(autoincrement())
+  user             User               @relation(fields: [userId], references: [id])
+  userId           String
+  Product          Product[]
+  ProductsOnOrders ProductsOnOrders[]
 }
 
 model Product {
-    id          Int     @id @default(autoincrement())
-    name        String
-    description String?
-    price       Float
+  id               Int                @id @default(autoincrement())
+  name             String
+  description      String?
+  price            Float
+  Order            Order?             @relation(fields: [orderId], references: [id])
+  orderId          Int?
+  ProductsOnOrders ProductsOnOrders[]
+}
+
+model ProductsOnOrders {
+  productId Int
+  productCount Int
+  orderId   Int
+  product   Product @relation(fields: [productId], references: [id])
+  order     Order   @relation(fields: [orderId], references: [id])
+
+  @@id([productId, orderId])
+}
+
+model Coupon {
+  id    Int     @id @default(autoincrement())
+  code  String
+  discountPercentage Float
 }

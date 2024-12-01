@@ -22,6 +22,7 @@ export function CartBadge(): JSX.Element {
   const isHovering = useHoverDirty(ref);
 
   const containerClass = clsx("flex gap-4", {
+    "cursor-default": totalCount === 0,
     "cursor-pointer": totalCount > 0,
     hidden: pathname.startsWith("/cart"),
   });
@@ -42,12 +43,12 @@ export function CartBadge(): JSX.Element {
   };
 
   return (
-    <div className={containerClass} onClick={handleClick}>
+    <button className={containerClass} type="button" onClick={handleClick}>
       <div className={textClass}>Carrinho vazio</div>
       <div ref={ref} className="relative select-none">
         <div className={badgeClass}>{totalCount}</div>
         <ShoppingCartIcon />
       </div>
-    </div>
+    </button>
   );
 }

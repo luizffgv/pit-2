@@ -13,6 +13,29 @@ import { useCallback } from "react";
 import { useUser } from "@auth0/nextjs-auth0/client";
 import { useUserFavorites } from "@/contexts/UserFavoritesContext";
 import Link from "next/link";
+import { cva } from "class-variance-authority";
+import clsx from "clsx";
+
+const bottomButtonsCva = cva("flex", {
+  variants: {
+    isLoggedIn: {
+      false: "invisible",
+      true: "visible",
+    },
+  },
+});
+
+const favoriteButonCva = cva(
+  "flex items-center gap-2 rounded-md rounded-l-none border-l-2 border-l-orange-950 px-4 py-2 transition ",
+  {
+    variants: {
+      favorite: {
+        true: clsx("bg-red-600 text-white"),
+        false: clsx("bg-orange-200 text-red-600 hover:bg-orange-300"),
+      },
+    },
+  },
+);
 
 type Props = {
   product: Product;
@@ -21,7 +44,7 @@ type Props = {
 export function ProductPreview({ product }: Props): JSX.Element {
   const { addItem } = useCart();
 
-  const { error: errorUser, isLoading: isLoadingUser } = useUser();
+  const { error: errorUser, isLoading: isLoadingUser, user } = useUser();
 
   const { favorite, favoriteProducts, unfavorite } = useUserFavorites();
 
@@ -42,7 +65,7 @@ export function ProductPreview({ product }: Props): JSX.Element {
   }
 
   return (
-    <div className="flex w-64 flex-col justify-between gap-4 rounded-md border-4 border-orange-950 bg-orange-100 shadow-md">
+    <div className="flex w-64 flex-col justify-between gap-4 rounded-md border-4 border-red-950 bg-orange-100 shadow-md">
       <div className="flex flex-col gap-6 px-4 pt-4">
         <div className="flex justify-between gap-2">
           <div className="text-xl font-bold text-orange-950">
@@ -69,7 +92,7 @@ export function ProductPreview({ product }: Props): JSX.Element {
             currency: "BRL",
           }).format(product.price)}
         </div>
-        <div className="flex">
+        <div className={bottomButtonsCva({ isLoggedIn: user != null })}>
           <button
             className="flex items-center gap-2 rounded-md rounded-r-none bg-orange-200 px-4 py-2 text-orange-950 transition hover:bg-orange-300"
             aria-label="Adicionar ao carrinho"
@@ -82,12 +105,14 @@ export function ProductPreview({ product }: Props): JSX.Element {
             />
           </button>
           <button
-            className="flex items-center gap-2 rounded-md rounded-l-none border-l-2 border-l-orange-950 bg-orange-200 px-4 py-2 text-red-600 transition hover:bg-orange-300"
+            className={favoriteButonCva({
+              favorite: favoriteProducts.has(product.id),
+            })}
             aria-label="Adicionar aos favoritos"
             onClick={handleClickHeart}
           >
             <HeartIcon
-              className="mr-1 inline-block"
+              className="mr-1 inline-block [filter:drop-shadow(0_0_10px_white)]"
               size={16}
               strokeWidth={3}
               fill={favoriteProducts.has(product.id) ? "currentColor" : "none"}
